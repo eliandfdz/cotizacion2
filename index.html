@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>D°FDZ Cotizador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .navbar {
+      background-color: #002244;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .navbar img {
+      height: 40px;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+    .step-indicator {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      list-style: none;
+      padding: 0;
+    }
+    .step-indicator li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      color: #ccc;
+      font-weight: bold;
+      margin: 0 10px;
+    }
+    .step-indicator li.active {
+      border-color: #003366;
+      color: #003366;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background-color: #fff;
+      padding: 30px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    h2 {
+      color: #003366;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .button {
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background-color: #002244;
+    }
+    .servicio {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      gap: 10px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    .servicio label {
+      flex: 1 1 70%;
+      min-width: 250px;
+      margin: 0;
+    }
+    .cantidad-control {
+      flex: 1 1 25%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-cantidad {
+      padding: 5px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #eee;
+    }
+    .btn-cantidad:hover {
+      background-color: #ddd;
+    }
+    .cantidad {
+      width: 50px;
+      text-align: center;
+      padding: 5px;
+    }
+    #total {
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <img src="Logo BW.png" alt="D°FDZ">
+    <strong>Cotizador</strong>
+  </div>
+  <ul class="step-indicator">
+    <li id="indicator1" class="active">1</li>
+    <li id="indicator2">2</li>
+    <li id="indicator3">3</li>
+  </ul>
+  <div class="container">
+    <form id="cotizadorForm">
+      <!-- Paso 1 -->
+      <div class="step active" id="step1">
+        <h2>Paso 1: Selecciona tu paquete</h2>
+        <label><input type="radio" name="plan" value="Básico" required> Base - $6,500</label>
+        <label><input type="radio" name="plan" value="Intermedio" required> Elevado - $9,500</label>
+        <label><input type="radio" name="plan" value="Premium" required> Grado - $12,000</label>
+        <label><input type="radio" name="plan" value="Personalizado" required> Cotización personalizada <br>(PRECIO PERSONALIZADO A TU BOLSILLO)</label>
+        <div style="text-align: center; border: 1px solid #ccc; border-radius: 10px; padding: 20px; width: 200px; margin: 20px 0; box-shadow: 0 0 8px rgba(0,0,0,0.1);">
+          <a href="Paquetes.pdf" target="_blank" style="text-decoration: none; color: inherit; display: inline-block;">
+            <p style="font-size: 18px; margin: 0 0 10px;"><u>Consultar paquetes</u></p>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt="PDF" style="width: 50px; height: 60px;">
+            <p style="margin: 10px 0 0;">Paquetes.pdf</p>
+          </a>
+        </div>
+        <button type="button" class="button" onclick="nextStep(1)">Siguiente</button>
+      </div>
+      <!-- Paso 2 -->
+      <div class="step" id="step2">
+        <h2>Paso 2: Información del contratante</h2>
+        <label>Nombre:<input type="text" id="nombre" required></label>
+        <label>Email:<input type="email" id="email" required></label>
+        <label>Teléfono:<input type="text" id="telefono" required></label>
+        <label>Tipo de negocio:<input type="text" id="negocio" required></label>
+        <button type="button" class="button" onclick="prevStep(2)">Regresar</button>
+        <button type="button" class="button" onclick="nextStep(2)">Siguiente</button>
+      </div>
+         <!-- Paso 3A: estándar -->
+<div class="step" id="step3a">
+  <h2>Paso 3: Selecciona coberturas y servicios para paquetes estándar</h2>
+  <div class="checkboxes">
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Rediseño de logo" data-precio="500"> Rediseño de logo – $500</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Paleta y tipografía" data-precio="400"> Paleta de colores y tipografía – $400</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Página personalizada" data-precio="1200"> Página de inicio personalizada – $1,200</label>
+    </div>
+    <div class="servicio">
+  <label>
+    <input type="checkbox" name="servicios" value="Página adicional" id="paginaAdicionalCheckbox" data-precio="500">
+    Página adicional – $500 c/u
+  </label>
+  <div class="cantidad-control">
+    <button type="button" class="btn-cantidad" onclick="cambiarCantidad(-1)">−</button>
+    <input type="number" id="cantidadPaginas" class="cantidad" value="1" min="1" disabled>
+    <button type="button" class="btn-cantidad" onclick="cambiarCantidad(1)">+</button>
+  </div>
+</div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Galería" data-precio="500"> Galería – $500</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Formulario" data-precio="400"> Formulario de Contacto – $400</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Mapa" data-precio="300"> Mapa de google – $300</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Idiomas" data-precio="800"> Página en varios idiomas – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Animaciones" data-precio="400"> Animaciones – $400</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Video" data-precio="500"> Video tutorial – $500</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Tienda" data-precio="1000"> Tienda en línea (10 productos) – $1,000</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Carrito" data-precio="800"> Carrito de compras – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Pasarela" data-precio="800"> Pasarela de pagos – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Envíos" data-precio="800"> Configuración de envíos – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Hosting 1 año" data-precio="900"> Hosting por 1 año – $900</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Hosting 1 mes" data-precio="600"> Hosting por 1 mes – $600</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Dominio" data-precio="500"> Dominio por 1 año – $500</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="SSL" data-precio="800"> Certificado SSL – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Correo" data-precio="200"> Correo empresarial – $200</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Mantenimiento" data-precio="400"> Servicio o mantenimiento adicional – $400</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="SEO" data-precio="600"> SEO básico – $600</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Estrategia" data-precio="800"> Estrategia digital – $800</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Redes" data-precio="500"> Redes Sociales – $500</label>
+    </div>
+    <div class="servicio">
+      <label><input type="checkbox" name="servicios" value="Fotografías" data-precio="800"> Fotografías – $800</label>
+    </div>
+  </div>
+        <p id="total">Total: $0</p>
+        <button type="button" class="button" onclick="prevFromStep3('a')">Regresar</button>
+        <button type="button" class="button" onclick="calcularTotal()">Calcular Total</button>
+        <button type="submit" class="button">Generar PDF</button>
+      </div>
+      <!-- Paso 3B: personalizado -->
+      <div class="step" id="step3b">
+        <h2>Paso 3: Descarga tu caratula no oficial</h2>
+        <p>Cuéntanos más sobre lo que necesitas:</p>
+        <textarea placeholder="Describe tu proyecto aquí..." required></textarea>
+        <button type="button" class="button" onclick="prevFromStep3('b')">Regresar</button>
+        <button type="submit" class="button">Generar PDF</button>
+      </div>
+    </form>
+  </div>
+  <script>
+  // Avanzar de paso y actualizar indicador
+  function nextStep(currentStep) {
+    const planInput = document.querySelector('input[name="plan"]:checked');
+    const nombre    = document.getElementById("nombre").value.trim();
+    const email     = document.getElementById("email").value.trim();
+    const telefono  = document.getElementById("telefono").value.trim();
+    const negocio   = document.getElementById("negocio").value.trim();
+
+    if (currentStep === 1 && !planInput) {
+      return alert("Selecciona un paquete.");
+    }
+    if (currentStep === 2 && (!nombre || !email || !telefono || !negocio)) {
+      return alert("Completa todos los campos.");
+    }
+
+    // Oculta paso e indicador actual
+    document.getElementById(`step${currentStep}`).classList.remove("active");
+    document.getElementById(`indicator${currentStep}`).classList.remove("active");
+
+    let next;
+if (currentStep === 1) {
+  next = 2;
+} else {
+  // Si el plan es PERSONALIZADO → paso 3A (checkboxes)
+  // Si es otro (Básico, Intermedio, Premium) → paso 3B (descripción)
+  next = planInput.value.toLowerCase() === "personalizado" ? "3a" : "3b";
+}
+
+
+
+    // Muestra siguiente paso e indicador
+    document.getElementById(`step${next}`).classList.add("active");
+    document.getElementById(`indicator${next}`).classList.add("active");
+  }
+
+  // Retroceder un paso
+  function prevStep(step) {
+    document.getElementById(`step${step}`).classList.remove("active");
+    document.getElementById(`indicator${step}`).classList.remove("active");
+    const prev = step - 1;
+    document.getElementById(`step${prev}`).classList.add("active");
+    document.getElementById(`indicator${prev}`).classList.add("active");
+  }
+
+  // Retro desde paso 3
+  function prevFromStep3(tipo) {
+    document.getElementById(`step3${tipo}`).classList.remove("active");
+    document.getElementById("indicator3").classList.remove("active");
+    document.getElementById("step2").classList.add("active");
+    document.getElementById("indicator2").classList.add("active");
+  }
+
+  // Control de cantidad de páginas
+  function cambiarCantidad(cambio) {
+    const inp = document.getElementById("cantidadPaginas");
+    inp.value = Math.max(1, (parseInt(inp.value) || 1) + cambio);
+    calcularTotal();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("cotizadorForm");
+    const chk  = document.getElementById("paginaAdicionalCheckbox");
+    const inp  = document.getElementById("cantidadPaginas");
+
+    // Indicador inicial
+    document.getElementById("indicator1").classList.add("active");
+
+    chk.addEventListener("change", () => {
+      inp.disabled = !chk.checked;
+      calcularTotal();
+    });
+    inp.addEventListener("input", calcularTotal);
+
+    document
+      .querySelectorAll('#step3a input[name="servicios"]')
+      .forEach(cb => cb.addEventListener("change", calcularTotal));
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      if (validateForm()) generarPDF();
+    });
+
+    calcularTotal();
+  });
+
+  // Suma de servicios
+  function calcularTotal() {
+    let total = 0;
+    document
+      .querySelectorAll('#step3a input[name="servicios"]:checked')
+      .forEach(cb => total += parseInt(cb.dataset.precio) || 0);
+
+    if (document.getElementById("paginaAdicionalCheckbox").checked) {
+      total += 500 * (parseInt(document.getElementById("cantidadPaginas").value) || 1);
+    }
+
+    document.getElementById("total").textContent = `Total: $${total}`;
+    return total;
+  }
+
+  // Validar antes de PDF
+  function validateForm() {
+    const plan = document.querySelector('input[name="plan"]:checked').value.toLowerCase();
+    if (plan === "personalizado") {
+      // Debe seleccionar al menos un servicio
+      if (!document.querySelectorAll('#step3a input[name="servicios"]:checked').length) {
+        alert("Selecciona al menos un servicio.");
+        return false;
+      }
+    } else {
+      // Debe describir en textarea
+      if (!document.querySelector("#step3b textarea").value.trim()) {
+        alert("Describe el proyecto.");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Generar PDF
+  async function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const nom  = document.getElementById("nombre").value.trim();
+    const plan = document.querySelector('input[name="plan"]:checked').value.toLowerCase();
+
+    // Título
+    doc.setFontSize(16);
+    doc.text("Cotización no oficial – D°FDZ", 20, 20);
+    doc.setFontSize(12);
+
+    // Datos cliente
+    const datos = [
+      `Nombre: ${nom}`,
+      `Email: ${document.getElementById("email").value}`,
+      `Teléfono: ${document.getElementById("telefono").value}`,
+      `Negocio: ${document.getElementById("negocio").value}`,
+      `Plan seleccionado: ${plan.charAt(0).toUpperCase() + plan.slice(1)}`
+    ];
+    datos.forEach((t, i) => doc.text(t, 20, 35 + i * 7));
+
+    if (plan === "personalizado") {
+      // Incluye servicios
+      doc.text("Servicios seleccionados:", 20, 75);
+      const servs = Array.from(
+        document.querySelectorAll('#step3a input[name="servicios"]:checked')
+      ).map(cb => `- ${cb.value} ($${cb.dataset.precio})`);
+      if (document.getElementById("paginaAdicionalCheckbox").checked) {
+        const c = document.getElementById("cantidadPaginas").value;
+        servs.push(`- Página adicional x${c} ($${500 * c})`);
+      }
+      servs.forEach((l, i) => doc.text(l, 25, 85 + i * 7));
+      doc.text(document.getElementById("total").textContent, 20, 95 + servs.length * 7);
+      doc.save(`cotizacion_${nom || "cliente"}.pdf`);
+      return;
+    }
+
+    // Plan estándar: descripción
+    const desc = document.querySelector("#step3b textarea").value.trim();
+    doc.text("Descripción del proyecto:", 20, 75);
+    doc.text(doc.splitTextToSize(desc, 160), 25, 85);
+
+    doc.save(`cotizacion_${nom || "cliente"}.pdf`);
+  }
+</script>
+</body>
+</html>
